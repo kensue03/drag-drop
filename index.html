@@ -775,6 +775,13 @@
         }
         // 게임 시작 실행
         initGame();
+        // 페이지 진입 즉시 배경음악 자동 재생 시도
+        try {
+            soundManager.init();
+            soundManager.startBgm();
+        } catch (e) {
+            console.warn("Autoplay blocked by browser. Music will start on first user interaction.", e);
+        }
     </script>
 </body>
 </html>
