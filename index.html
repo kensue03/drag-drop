@@ -377,14 +377,14 @@
             <h1>🧠 "진짜 도파민"을 찾아라!</h1>
             <div class="subtitle">아래의 행동 카드를 알맞은 주머니에 드래그해서 넣어보세요!</div>
         </div>
-        <button id="bgm-toggle-btn" class="audio-btn" onclick="soundManager.toggleBgm()">
+        <button id="bgm-toggle-btn" class="audio-btn playing" onclick="soundManager.toggleBgm()">
             <div class="sound-wave">
                 <span></span>
                 <span></span>
                 <span></span>
                 <span></span>
             </div>
-            <span id="bgm-btn-text">🔊 배경음악 켜기</span>
+            <span id="bgm-btn-text">🔇 배경음악 끄기</span>
         </button>
     </div>
     <!-- 메인 게임 영역 -->
@@ -415,6 +415,7 @@
                 this.ctx = null;
                 this.bgmInterval = null;
                 this.isPlayingBgm = false;
+                this.bgmEnabled = true; // BGM 기본 활성화 상태 (ON by default)
                 this.melodyIndex = 0;
             }
             init() {
@@ -482,11 +483,13 @@
             }
             toggleBgm() {
                 this.init();
-                if (this.isPlayingBgm) {
+                if (this.bgmEnabled) {
+                    this.bgmEnabled = false;
                     this.stopBgm();
                     document.getElementById('bgm-btn-text').innerHTML = '🔊 배경음악 켜기';
                     document.getElementById('bgm-toggle-btn').classList.remove('playing');
                 } else {
+                    this.bgmEnabled = true;
                     this.startBgm();
                     document.getElementById('bgm-btn-text').innerHTML = '🔇 배경음악 끄기';
                     document.getElementById('bgm-toggle-btn').classList.add('playing');
@@ -545,9 +548,12 @@
             }
         }
         const soundManager = new SoundManager();
-        // 사용자 첫 터치/클릭 상호작용 발생 시 AudioContext 활성화
+        // 사용자 첫 터치/클릭 상호작용 발생 시 AudioContext 활성화 및 BGM 자동 시작
         function autoInitAudio() {
             soundManager.init();
+            if (soundManager.bgmEnabled && !soundManager.isPlayingBgm) {
+                soundManager.startBgm();
+            }
             document.removeEventListener('click', autoInitAudio);
             document.removeEventListener('touchstart', autoInitAudio);
             document.removeEventListener('dragstart', autoInitAudio);
