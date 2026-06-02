@@ -1,0 +1,689 @@
+<!DOCTYPE html><html lang="ko"><head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>진짜 도파민을 찾아라! - 분류 게임</title>
+
+<style>
+
+:root {
+
+--bg-color: #fcfbf4; /* 연한 노란색 배경 (Canva 톤앤매너 반영) */
+
+--green-dark: #2d5a27;
+
+--green-light: #e8f0e6;
+
+--fake-color: #e74c3c;
+
+--real-color: #2ecc71;
+
+}
+
+
+
+body {
+
+font-family: 'Malgun Gothic', sans-serif;
+
+background-color: var(--bg-color);
+
+margin: 0;
+
+padding: 20px;
+
+display: flex;
+
+flex-direction: column;
+
+align-items: center;
+
+user-select: none;
+
+}
+
+
+
+h1 {
+
+color: var(--green-dark);
+
+margin-bottom: 5px;
+
+font-size: 2rem;
+
+}
+
+
+
+.subtitle {
+
+color: #666;
+
+margin-bottom: 25px;
+
+font-size: 1.1rem;
+
+}
+
+
+
+/* 게임 보드 레이아웃 */
+
+.game-container {
+
+display: flex;
+
+flex-direction: column;
+
+width: 100%;
+
+max-width: 1000px;
+
+gap: 20px;
+
+}
+
+
+
+/* 드롭 존 (바구니) 영역 */
+
+.zones-container {
+
+display: flex;
+
+gap: 20px;
+
+width: 100%;
+
+}
+
+
+
+.zone {
+
+flex: 1;
+
+min-height: 200px;
+
+border: 3px dashed #ccc;
+
+border-radius: 15px;
+
+padding: 20px;
+
+display: flex;
+
+flex-direction: column;
+
+align-items: center;
+
+gap: 10px;
+
+background-color: #fff;
+
+transition: all 0.3s ease;
+
+}
+
+
+
+.zone-title {
+
+font-size: 1.5rem;
+
+font-weight: bold;
+
+margin-bottom: 10px;
+
+padding: 5px 15px;
+
+border-radius: 20px;
+
+color: white;
+
+}
+
+
+
+#fake-zone.hover {
+
+background-color: #fde8e7;
+
+border-color: var(--fake-color);
+
+}
+
+
+
+#real-zone.hover {
+
+background-color: #eafaf1;
+
+border-color: var(--real-color);
+
+}
+
+
+
+.fake-title { background-color: var(--fake-color); }
+
+.real-title { background-color: var(--real-color); }
+
+
+
+/* 카드 배치 영역 */
+
+.card-pool {
+
+display: flex;
+
+flex-wrap: wrap;
+
+gap: 12px;
+
+justify-content: center;
+
+padding: 20px;
+
+background: #fff;
+
+border-radius: 15px;
+
+border: 1px solid #ddd;
+
+min-height: 120px;
+
+box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+
+}
+
+
+
+/* 카드 스타일 */
+
+.card {
+
+background-color: var(--green-light);
+
+color: var(--green-dark);
+
+border: 2px solid var(--green-dark);
+
+padding: 12px 18px;
+
+border-radius: 25px;
+
+cursor: grab;
+
+font-size: 1rem;
+
+font-weight: bold;
+
+box-shadow: 0 3px 5px rgba(0,0,0,0.1);
+
+transition: transform 0.2s, box-shadow 0.2s;
+
+max-width: 300px;
+
+text-align: center;
+
+}
+
+
+
+.card:active {
+
+cursor: grabbing;
+
+transform: scale(0.95);
+
+}
+
+
+
+.card.dragging {
+
+opacity: 0.5;
+
+}
+
+
+
+/* 분류 완료된 카드 스케일 다운 */
+
+.zone .card {
+
+max-width: 100%;
+
+width: 90%;
+
+font-size: 0.9rem;
+
+padding: 8px 12px;
+
+cursor: default;
+
+pointer-events: none; /* 정답 처리 후 드래그 방지 */
+
+}
+
+.fake-settled { background-color: #fde8e7 !important; border-color: var(--fake-color) !important; color: var(--fake-color) !important;}
+
+.real-settled { background-color: #eafaf1 !important; border-color: var(--real-color) !important; color: var(--real-color) !important;}
+
+
+
+/* 결과 메시지 팝업 */
+
+.modal {
+
+display: none;
+
+position: fixed;
+
+top: 50%;
+
+left: 50%;
+
+transform: translate(-50%, -50%);
+
+background: white;
+
+padding: 30px;
+
+border-radius: 20px;
+
+box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+
+text-align: center;
+
+z-index: 100;
+
+width: 80%;
+
+max-width: 400px;
+
+}
+
+
+
+.modal h2 { margin-top: 0; font-size: 1.8rem; }
+
+.modal p { font-size: 1.1rem; color: #55px; line-height: 1.5; }
+
+.modal button {
+
+background-color: var(--green-dark);
+
+color: white;
+
+border: none;
+
+padding: 10px 25px;
+
+font-size: 1rem;
+
+border-radius: 10px;
+
+cursor: pointer;
+
+margin-top: 15px;
+
+}
+
+
+
+.overlay {
+
+display: none;
+
+position: fixed;
+
+top:0; left:0; width:100%; height:100%;
+
+background: rgba(0,0,0,0.4);
+
+z-index: 99;
+
+}
+
+</style></head><body>
+
+
+
+<h1>🧠 "진짜 도파민"을 찾아라!</h1>
+
+<div class="subtitle">아래의 행동 카드를 알맞은 주머니에 드래그해서 넣어보세요!</div>
+
+
+
+<div class="game-container">
+
+<!-- 바구니 영역 -->
+
+<div class="zones-container">
+
+<div id="fake-zone" class="zone" data-type="fake">
+
+<div class="zone-title fake-title">가짜 도파민 🛑</div>
+
+</div>
+
+<div id="real-zone" class="zone" data-type="real">
+
+<div class="zone-title real-title">진짜 도파민 ✨</div>
+
+</div>
+
+</div>
+
+
+
+<!-- 무작위 카드 풀 -->
+
+<div id="card-pool" class="card-pool"></div>
+
+</div>
+
+
+
+<!-- 알림 팝업 시스템 -->
+
+<div id="overlay" class="overlay"></div>
+
+<div id="modal" class="modal">
+
+<h2 id="modal-title">결과</h2>
+
+<p id="modal-desc"></p>
+
+<button onclick="closeModal()">확인</button>
+
+</div>
+
+
+
+<script>
+
+// 1. 기획안의 10개 데이터 정의
+
+const itemData = [
+
+{ text: "스마트폰으로 짧은 동영상(숏폼) 끝없이 넘겨보기", type: "fake" },
+
+{ text: "어려운 수학 문제를 포기하지 않고 끝까지 풀어내기", type: "real" },
+
+{ text: "돈을 걸고 하는 사행성 게임이나 뽑기 하기", type: "fake" },
+
+{ text: "줄넘기 2단 뛰기를 매일 연습해서 마침내 성공하기", type: "real" },
+
+{ text: "내가 직접 계획을 세워서 방 청소 깔끔하게 끝내기", type: "real" },
+
+{ text: "클릭 몇 번으로 쉽게 강력한 게임 아이템 사기", type: "fake" },
+
+{ text: "용돈을 차곡차곡 모아서 갖고 싶던 물건 사기", type: "real" },
+
+{ text: "자극적인 게임을 하며 밤새도록 컴퓨터 앞에 앉아있기", type: "fake" },
+
+{ text: "피아노 곡이나 동아리 춤 연습을 해서 무대에서 멋지게 공연하기", type: "real" },
+
+{ text: "SNS에 사진을 올리고 '좋아요' 알림만 계속 새로고침 하기", type: "fake" }
+
+];
+
+
+
+const cardPool = document.getElementById('card-pool');
+
+const zones = document.querySelectorAll('.zone');
+
+let currentDragCard = null;
+
+let totalCardsCount = itemData.length;
+
+let correctCount = 0;
+
+
+
+// 2. 카드 무작위 섞기 (셔플 알고리즘)
+
+function shuffle(array) {
+
+for (let i = array.length - 1; i > 0; i--) {
+
+const j = Math.floor(Math.random() * (i + 1));
+
+[array[i], array[j]] = [array[j], array[i]];
+
+}
+
+return array;
+
+}
+
+
+
+// 3. 게임 초기화 및 카드 생성
+
+function initGame() {
+
+cardPool.innerHTML = '';
+
+correctCount = 0;
+
+document.getElementById('fake-zone').innerHTML = '<div class="zone-title fake-title">가짜 도파민 🛑</div>';
+
+document.getElementById('real-zone').innerHTML = '<div class="zone-title real-title">진짜 도파민 ✨</div>';
+
+
+const shuffledData = shuffle([...itemData]);
+
+
+
+shuffledData.forEach((item, index) => {
+
+const card = document.createElement('div');
+
+card.classList.add('card');
+
+card.setAttribute('draggable', 'true');
+
+card.innerText = item.text;
+
+card.dataset.type = item.type;
+
+card.id = `card-${index}`;
+
+
+
+// 드래그 이벤트 리스너 등록
+
+card.addEventListener('dragstart', dragStart);
+
+card.addEventListener('dragend', dragEnd);
+
+
+
+// 모바일 터치 대응을 위한 기본 터치 이벤트 설정 (필요시 복합 라이브러리 사용 권장하나 기본 탑재)
+
+card.addEventListener('touchstart', handleTouchStart, {passive: true});
+
+
+
+cardPool.appendChild(card);
+
+});
+
+}
+
+
+
+// 4. 드래그 앤 드롭 핵심 로직
+
+function dragStart() {
+
+currentDragCard = this;
+
+this.classList.add('dragging');
+
+}
+
+
+
+function dragEnd() {
+
+this.classList.remove('dragging');
+
+}
+
+
+
+zones.forEach(zone => {
+
+zone.addEventListener('dragover', (e) => {
+
+e.preventDefault(); // 드롭 허용
+
+});
+
+
+
+zone.addEventListener('dragenter', function() {
+
+this.classList.add('hover');
+
+});
+
+
+
+zone.addEventListener('dragleave', function() {
+
+this.classList.remove('hover');
+
+});
+
+
+
+zone.addEventListener('drop', function() {
+
+this.classList.remove('hover');
+
+if (!currentDragCard) return;
+
+
+
+const cardType = currentDragCard.dataset.type;
+
+const zoneType = this.dataset.type;
+
+
+
+// 정답 검증
+
+if (cardType === zoneType) {
+
+// 성공 피드백 연출
+
+currentDragCard.removeAttribute('draggable');
+
+if(zoneType === 'fake') {
+
+currentDragCard.classList.add('fake-settled');
+
+} else {
+
+currentDragCard.classList.add('real-settled');
+
+}
+
+this.appendChild(currentDragCard);
+
+
+showModal("🎉 정답입니다!",
+
+zoneType === 'fake'
+
+? "정답! 노력 없이 얻는 짜릿함은 금방 사라지고 우리 뇌를 지치게 만들어요!"
+
+: "딩동댕! 스스로 땀 흘려 얻은 성취감은 우리의 뇌와 마음을 튼튼하게 성장시켜요!"
+
+);
+
+correctCount++;
+
+
+// 모든 카드를 맞춘 경우 게임 클리어
+
+if(correctCount === totalCardsCount) {
+
+setTimeout(() => {
+
+showModal("🏆 미션 클리어!", "모든 도파민 카드를 완벽하게 구별해냈어요! 이제 일상에서도 진짜 도파민을 채우는 멋진 어린이가 되어봐요!");
+
+}, 800);
+
+}
+
+} else {
+
+// 오답 피드백 연출
+
+showModal("😢 앗, 다시 생각해 볼까요?", "이 행동은 진짜 나를 성장시키는 행동일까요, 아니면 순간의 짜릿함뿐일까요?");
+
+}
+
+currentDragCard = null;
+
+});
+
+});
+
+
+
+// 5. 알림창(모달) 제어
+
+function showModal(title, desc) {
+
+document.getElementById('modal-title').innerText = title;
+
+document.getElementById('modal-desc').innerText = desc;
+
+document.getElementById('overlay').style.display = 'block';
+
+document.getElementById('modal').style.display = 'block';
+
+}
+
+
+
+function closeModal() {
+
+document.getElementById('overlay').style.display = 'none';
+
+document.getElementById('modal').style.display = 'none';
+
+}
+
+
+
+// 모바일 환경을 위한 간단한 터치 안내 기능 (PC 마우스 드래그 최적화 기준)
+
+function handleTouchStart() {
+
+// 모바일 환경 하이브리드 대응을 고도화하려면 터치 좌표 이동 로직이 추가로 요구됩니다.
+
+// 본 데모는 학교 PC 및 전자칠판/마우스 환경에 최적화되어 있습니다.
+
+}
+
+
+
+// 게임 시작 실행
+
+initGame();
+
+</script></body></html> 
+
