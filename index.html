@@ -4,32 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>진짜 도파민을 찾아라! - 분류 게임</title>
+    
+    <!-- 귀여운 둥글글씨 구글 폰트 적용 -->
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;700;900&display=swap');
         :root {
-            --bg-color: #fcfbf4; /* 연한 노란색 배경 (Canva 톤앤매너 반영) */
-            --green-dark: #2d5a27;
-            --green-light: #e8f0e6;
-            --fake-color: #e74c3c;
-            --real-color: #2ecc71;
+            --bg-color: #FAF9F5; /* 따뜻한 웜 크림 */
+            --green-dark: #1E3F1A;
+            --green-light: #EBF5E9;
+            --fake-color: #E74C3C;
+            --real-color: #2ECC71;
+            --primary-shadow: 0 10px 30px rgba(30, 63, 26, 0.05);
         }
         body {
-            font-family: 'Malgun Gothic', sans-serif;
+            font-family: 'Gowun Dodum', 'Noto Sans KR', sans-serif;
             background-color: var(--bg-color);
+            /* 아기자기한 도트 패턴 디자인 */
+            background-image: 
+                radial-gradient(#e5dec9 1.5px, transparent 1.5px), 
+                radial-gradient(#e5dec9 1.5px, var(--bg-color) 1.5px);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
             margin: 0;
             padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
             user-select: none;
+            min-height: 100vh;
+            box-sizing: border-box;
         }
-        /* 헤더 레이아웃 */
+        /* 헤더 전체 컨테이너 */
         .header-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
             width: 100%;
             max-width: 1000px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 20px 30px;
+            border-radius: 24px;
+            border: 2px solid #E8E5DA;
+            box-shadow: var(--primary-shadow);
+            box-sizing: border-box;
             gap: 20px;
         }
         .title-area {
@@ -39,42 +58,293 @@
         }
         h1 {
             color: var(--green-dark);
-            margin: 0 0 5px 0;
-            font-size: 2rem;
+            margin: 0 0 6px 0;
+            font-size: 2.2rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
         }
         .subtitle {
             color: #666;
             margin: 0;
-            font-size: 1.1rem;
+            font-size: 1.15rem;
+            font-weight: 700;
         }
-        /* 오디오 컨트롤 버튼 */
+        /* 프리미엄 음향 조절 버튼 */
         .audio-btn {
             background-color: var(--green-dark);
             color: white;
             border: none;
-            padding: 10px 20px;
-            font-size: 1rem;
-            font-weight: bold;
-            border-radius: 25px;
+            padding: 12px 22px;
+            font-size: 1.05rem;
+            font-weight: 900;
+            font-family: inherit;
+            border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: all 0.2s ease;
+            box-shadow: 0 6px 15px rgba(30, 63, 26, 0.25);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 12px;
             white-space: nowrap;
         }
         .audio-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 10px 20px rgba(30, 63, 26, 0.35);
         }
         .audio-btn:active {
-            transform: scale(0.98);
+            transform: translateY(0) scale(0.98);
         }
         .audio-btn.playing {
-            background-color: #27ae60;
-            animation: music-bounce 1s infinite alternate ease-in-out;
+            background-color: #27AE60;
+            box-shadow: 0 6px 15px rgba(39, 174, 96, 0.25);
         }
-        @keyframes music-bounce {
-            0% { transform: translateY(0) scale(1.05); }
-            100% { transform: translateY(-4px) scale(1.05); }
+        /* 춤추는 사운드 웨이브 바 */
+        .sound-wave {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            width: 18px;
+            height: 14px;
+        }
+        .sound-wave span {
+            display: block;
+            width: 3px;
+            height: 100%;
+            background-color: white;
+            border-radius: 2px;
+            transform-origin: bottom;
+            animation: bounce-bar 0.7s ease-in-out infinite alternate;
+            animation-play-state: paused;
+        }
+        .sound-wave span:nth-child(2) { animation-delay: 0.15s; }
+        .sound-wave span:nth-child(3) { animation-delay: 0.3s; }
+        .sound-wave span:nth-child(4) { animation-delay: 0.45s; }
+        .audio-btn.playing .sound-wave span {
+            animation-play-state: running;
+        }
+        @keyframes bounce-bar {
+            0% { transform: scaleY(0.2); }
+            100% { transform: scaleY(1); }
+        }
+        /* 게임 보드 메인 레이아웃 */
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 1000px;
+            gap: 25px;
+        }
+        /* 분류 포켓(바구니) 영역 */
+        .zones-container {
+            display: flex;
+            gap: 25px;
+            width: 100%;
+        }
+        .zone {
+            flex: 1;
+            min-height: 260px;
+            border: 3px dashed #C3C0B5;
+            border-radius: 24px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            background-color: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(5px);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            box-sizing: border-box;
+        }
+        #fake-zone {
+            border-color: rgba(231, 76, 60, 0.35);
+        }
+        #real-zone {
+            border-color: rgba(46, 204, 113, 0.35);
+        }
+        /* 드롭존 호버 시 화려한 모션 */
+        #fake-zone.hover {
+            background-color: #FFF5F5;
+            border-color: var(--fake-color);
+            transform: scale(1.02);
+            box-shadow: 0 15px 35px rgba(231, 76, 60, 0.12);
+        }
+        #real-zone.hover {
+            background-color: #F4FBF7;
+            border-color: var(--real-color);
+            transform: scale(1.02);
+            box-shadow: 0 15px 35px rgba(46, 204, 113, 0.12);
+        }
+        .zone-title {
+            font-size: 1.45rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            padding: 8px 24px;
+            border-radius: 50px;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .fake-title { background-color: var(--fake-color); }
+        .real-title { background-color: var(--real-color); }
+        /* 카드 배치 보관함 */
+        .card-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: center;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            border: 2px solid #E8E5DA;
+            min-height: 140px;
+            box-shadow: var(--primary-shadow);
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        /* 행동 드래그 카드 */
+        .card {
+            background-color: #ffffff;
+            color: #2D2D2D;
+            border: 2px solid #E8E5DA;
+            padding: 15px 24px;
+            border-radius: 20px;
+            cursor: grab;
+            font-size: 1.05rem;
+            font-weight: 700;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.03);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            max-width: 320px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+            box-sizing: border-box;
+        }
+        .card:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 12px 24px rgba(30, 63, 26, 0.08);
+            border-color: var(--green-dark);
+        }
+        .card:active {
+            cursor: grabbing;
+            transform: translateY(-2px) scale(0.98);
+        }
+        .card.dragging {
+            opacity: 0.4;
+            transform: scale(0.95);
+        }
+        .card-emoji {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card-text {
+            line-height: 1.4;
+        }
+        /* 안착된 카드 스타일 (스케일 다운 및 고정) */
+        .zone .card {
+            max-width: 100%;
+            width: 95%;
+            font-size: 0.95rem;
+            padding: 10px 16px;
+            cursor: default;
+            pointer-events: none; /* 드래그 잠금 */
+            box-shadow: none;
+            animation: settled-pop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes settled-pop {
+            0% { transform: scale(0.85); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .fake-settled { 
+            background-color: #FFF5F5 !important; 
+            border-color: var(--fake-color) !important; 
+            color: var(--fake-color) !important;
+        }
+        .real-settled { 
+            background-color: #F4FBF7 !important; 
+            border-color: var(--real-color) !important; 
+            color: var(--real-color) !important;
+        }
+        /* 프리미엄 바운싱 팝업 모달 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: white;
+            padding: 35px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(30, 63, 26, 0.2);
+            text-align: center;
+            z-index: 1000;
+            width: 85%;
+            max-width: 440px;
+            box-sizing: border-box;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .modal.show {
+            display: block;
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .modal h2 { 
+            margin-top: 0; 
+            font-size: 1.9rem; 
+            font-weight: 900;
+            color: var(--green-dark);
+        }
+        
+        .modal p { 
+            font-size: 1.15rem; 
+            color: #555; 
+            line-height: 1.6;
+            margin: 15px 0 25px 0;
+            font-weight: 700;
+        }
+        .modal button {
+            background-color: var(--green-dark);
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            font-size: 1.1rem;
+            font-weight: 900;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(30, 63, 26, 0.2);
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        .modal button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(30, 63, 26, 0.3);
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(30, 63, 26, 0.4);
+            backdrop-filter: blur(6px);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .overlay.show {
+            display: block;
+            opacity: 1;
+        }
+        /* 꽃가루 폭죽 파티클 */
+        .confetti-particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1001;
         }
         @media (max-width: 768px) {
             .header-container {
@@ -82,164 +352,57 @@
                 align-items: center;
                 text-align: center;
                 gap: 15px;
+                padding: 20px;
             }
             .title-area {
                 align-items: center;
             }
-        }
-        /* 게임 보드 레이아웃 */
-        .game-container {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            max-width: 1000px;
-            gap: 20px;
-        }
-        /* 드롭 존 (바구니) 영역 */
-        .zones-container {
-            display: flex;
-            gap: 20px;
-            width: 100%;
-        }
-        .zone {
-            flex: 1;
-            min-height: 200px;
-            border: 3px dashed #ccc;
-            border-radius: 15px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            background-color: #fff;
-            transition: all 0.3s ease;
-        }
-        .zone-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-            padding: 5px 15px;
-            border-radius: 20px;
-            color: white;
-        }
-        #fake-zone.hover {
-            background-color: #fde8e7;
-            border-color: var(--fake-color);
-        }
-        #real-zone.hover {
-            background-color: #eafaf1;
-            border-color: var(--real-color);
-        }
-        .fake-title { background-color: var(--fake-color); }
-        .real-title { background-color: var(--real-color); }
-        /* 카드 배치 영역 */
-        .card-pool {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            justify-content: center;
-            padding: 20px;
-            background: #fff;
-            border-radius: 15px;
-            border: 1px solid #ddd;
-            min-height: 120px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-        /* 카드 스타일 */
-        .card {
-            background-color: var(--green-light);
-            color: var(--green-dark);
-            border: 2px solid var(--green-dark);
-            padding: 12px 18px;
-            border-radius: 25px;
-            cursor: grab;
-            font-size: 1rem;
-            font-weight: bold;
-            box-shadow: 0 3px 5px rgba(0,0,0,0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
-            max-width: 300px;
-            text-align: center;
-        }
-        .card:active {
-            cursor: grabbing;
-            transform: scale(0.95);
-        }
-        .card.dragging {
-            opacity: 0.5;
-        }
-        /* 분류 완료된 카드 스케일 다운 */
-        .zone .card {
-            max-width: 100%;
-            width: 90%;
-            font-size: 0.9rem;
-            padding: 8px 12px;
-            cursor: default;
-            pointer-events: none; /* 정답 처리 후 드래그 방지 */
-        }
-        .fake-settled { background-color: #fde8e7 !important; border-color: var(--fake-color) !important; color: var(--fake-color) !important;}
-        .real-settled { background-color: #eafaf1 !important; border-color: var(--real-color) !important; color: var(--real-color) !important;}
-        /* 결과 메시지 팝업 */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            text-align: center;
-            z-index: 100;
-            width: 80%;
-            max-width: 400px;
-        }
-        .modal h2 { margin-top: 0; font-size: 1.8rem; }
-        .modal p { font-size: 1.1rem; color: #55px; line-height: 1.5; }
-        .modal button {
-            background-color: var(--green-dark);
-            color: white;
-            border: none;
-            padding: 10px 25px;
-            font-size: 1rem;
-            border-radius: 10px;
-            cursor: pointer;
-            margin-top: 15px;
-        }
-        .overlay {
-            display: none;
-            position: fixed;
-            top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.4);
-            z-index: 99;
+            .zones-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .zone {
+                min-height: 200px;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- 헤더 레이아웃 -->
     <div class="header-container">
         <div class="title-area">
             <h1>🧠 "진짜 도파민"을 찾아라!</h1>
             <div class="subtitle">아래의 행동 카드를 알맞은 주머니에 드래그해서 넣어보세요!</div>
         </div>
         <button id="bgm-toggle-btn" class="audio-btn" onclick="soundManager.toggleBgm()">
-            🔊 배경음악 켜기
+            <div class="sound-wave">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <span id="bgm-btn-text">🔊 배경음악 켜기</span>
         </button>
     </div>
+    <!-- 메인 게임 영역 -->
     <div class="game-container">
-        <!-- 바구니 영역 -->
+        <!-- 드롭 포켓 -->
         <div class="zones-container">
             <div id="fake-zone" class="zone" data-type="fake">
-                <div class="zone-title fake-title">가짜 도파민 🛑</div>
+                <div class="zone-title fake-title">🛑 가짜 도파민</div>
             </div>
             <div id="real-zone" class="zone" data-type="real">
-                <div class="zone-title real-title">진짜 도파민 ✨</div>
+                <div class="zone-title real-title">✨ 진짜 도파민</div>
             </div>
         </div>
-        <!-- 무작위 카드 풀 -->
+        <!-- 무작위 카드 보관함 -->
         <div id="card-pool" class="card-pool"></div>
     </div>
     <!-- 알림 팝업 시스템 -->
-    <div id="overlay" class="overlay"></div>
+    <div id="overlay" class="overlay" onclick="closeModal()"></div>
     <div id="modal" class="modal">
         <h2 id="modal-title">결과</h2>
         <p id="modal-desc"></p>
@@ -321,11 +484,11 @@
                 this.init();
                 if (this.isPlayingBgm) {
                     this.stopBgm();
-                    document.getElementById('bgm-toggle-btn').innerHTML = '🔊 배경음악 켜기';
+                    document.getElementById('bgm-btn-text').innerHTML = '🔊 배경음악 켜기';
                     document.getElementById('bgm-toggle-btn').classList.remove('playing');
                 } else {
                     this.startBgm();
-                    document.getElementById('bgm-toggle-btn').innerHTML = '🔇 배경음악 끄기';
+                    document.getElementById('bgm-btn-text').innerHTML = '🔇 배경음악 끄기';
                     document.getElementById('bgm-toggle-btn').classList.add('playing');
                 }
             }
@@ -392,18 +555,18 @@
         document.addEventListener('click', autoInitAudio);
         document.addEventListener('touchstart', autoInitAudio);
         document.addEventListener('dragstart', autoInitAudio);
-        // 1. 기획안의 10개 데이터 정의
+        // 1. 기획안의 10개 데이터 정의 (귀여운 이모지 및 수정 요구사항 포함)
         const itemData = [
-            { text: "스마트폰으로 짧은 동영상(숏폼) 끝없이 넘겨보기", type: "fake" },
-            { text: "어려운 수학 문제를 포기하지 않고 끝까지 풀어내기", type: "real" },
-            { text: "수차례 시도 끝에 인형 뽑기 기계에서 인형 뽑기 성공하기", type: "fake" },
-            { text: "줄넘기 2단 뛰기를 매일 연습해서 마침내 성공하기", type: "real" },
-            { text: "내가 직접 계획을 세워서 방 청소 깔끔하게 끝내기", type: "real" },
-            { text: "클릭 몇 번으로 쉽게 강력한 게임 아이템 사기", type: "fake" },
-            { text: "용돈을 차곡차곡 모아서 갖고 싶던 물건 사기", type: "real" },
-            { text: "자극적인 게임을 하며 밤새도록 컴퓨터 앞에 앉아있기", type: "fake" },
-            { text: "피아노 곡이나 동아리 춤 연습을 해서 무대에서 멋지게 공연하기", type: "real" },
-            { text: "SNS에 사진을 올리고 '좋아요' 알림만 계속 새로고침 하기", type: "fake" }
+            { text: "스마트폰으로 짧은 동영상(숏폼) 끝없이 넘겨보기", type: "fake", emoji: "📱" },
+            { text: "어려운 수학 문제를 포기하지 않고 끝까지 풀어내기", type: "real", emoji: "✍️" },
+            { text: "수차례 시도 끝에 인형 뽑기 기계에서 인형 뽑기 성공하기", type: "fake", emoji: "🧸" },
+            { text: "줄넘기 2단 뛰기를 매일 연습해서 마침내 성공하기", type: "real", emoji: "🏃" },
+            { text: "내가 직접 계획을 세워서 방 청소 깔끔하게 끝내기", type: "real", emoji: "🧹" },
+            { text: "클릭 몇 번으로 쉽게 강력한 게임 아이템 사기", type: "fake", emoji: "⚔️" },
+            { text: "용돈을 차곡차곡 모아서 갖고 싶던 물건 사기", type: "real", emoji: "🐷" },
+            { text: "자극적인 게임을 하며 밤새도록 컴퓨터 앞에 앉아있기", type: "fake", emoji: "🖥️" },
+            { text: "피아노 곡이나 동아리 춤 연습을 해서 무대에서 멋지게 공연하기", type: "real", emoji: "🎹" },
+            { text: "SNS에 사진을 올리고 '좋아요' 알림만 계속 새로고침 하기", type: "fake", emoji: "❤️" }
         ];
         const cardPool = document.getElementById('card-pool');
         const zones = document.querySelectorAll('.zone');
@@ -422,15 +585,17 @@
         function initGame() {
             cardPool.innerHTML = '';
             correctCount = 0;
-            document.getElementById('fake-zone').innerHTML = '<div class="zone-title fake-title">가짜 도파민 🛑</div>';
-            document.getElementById('real-zone').innerHTML = '<div class="zone-title real-title">진짜 도파민 ✨</div>';
+            document.getElementById('fake-zone').innerHTML = '<div class="zone-title fake-title">🛑 가짜 도파민</div>';
+            document.getElementById('real-zone').innerHTML = '<div class="zone-title real-title">✨ 진짜 도파민</div>';
             
             const shuffledData = shuffle([...itemData]);
             shuffledData.forEach((item, index) => {
                 const card = document.createElement('div');
                 card.classList.add('card');
                 card.setAttribute('draggable', 'true');
-                card.innerText = item.text;
+                
+                // 프리미엄 이모지 데코 구조 추가
+                card.innerHTML = `<span class="card-emoji">${item.emoji}</span><span class="card-text">${item.text}</span>`;
                 card.dataset.type = item.type;
                 card.id = `card-${index}`;
                 // 드래그 이벤트 리스너 등록
@@ -459,7 +624,7 @@
             zone.addEventListener('dragleave', function() {
                 this.classList.remove('hover');
             });
-            zone.addEventListener('drop', function() {
+            zone.addEventListener('drop', function(e) {
                 this.classList.remove('hover');
                 if (!currentDragCard) return;
                 const cardType = currentDragCard.dataset.type;
@@ -468,6 +633,12 @@
                 if (cardType === zoneType) {
                     // 성공 피드백 연출 및 효과음 재생
                     soundManager.playCorrect();
+                    
+                    // 꽃가루 파티클 터트리기 (현재 드롭 좌표 기준)
+                    const rect = this.getBoundingClientRect();
+                    const dropX = e.clientX || (rect.left + rect.width / 2);
+                    const dropY = e.clientY || (rect.top + rect.height / 2);
+                    launchConfetti(dropX, dropY);
                     currentDragCard.removeAttribute('draggable');
                     if(zoneType === 'fake') {
                         currentDragCard.classList.add('fake-settled');
@@ -486,6 +657,12 @@
                     // 모든 카드를 맞춘 경우 게임 클리어
                     if(correctCount === totalCardsCount) {
                         setTimeout(() => {
+                            // 대규모 축하 꽃가루 폭격
+                            for(let i=0; i<3; i++) {
+                                setTimeout(() => {
+                                    launchConfetti(window.innerWidth * (0.2 + i * 0.3), window.innerHeight * 0.4);
+                                }, i * 300);
+                            }
                             showModal("🏆 미션 클리어!", "모든 도파민 카드를 완벽하게 구별해냈어요! 이제 일상에서도 진짜 도파민을 채우는 멋진 어린이가 되어봐요!");
                         }, 800);
                     }
@@ -501,17 +678,94 @@
         function showModal(title, desc) {
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-desc').innerText = desc;
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById('modal').style.display = 'block';
+            
+            const overlay = document.getElementById('overlay');
+            const modal = document.getElementById('modal');
+            
+            overlay.style.display = 'block';
+            modal.style.display = 'block';
+            
+            // 리플로우 강제 후 클래스 추가 (페이드인 및 스케일 애니메이션)
+            setTimeout(() => {
+                overlay.classList.add('show');
+                modal.classList.add('show');
+            }, 10);
         }
         function closeModal() {
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('modal').style.display = 'none';
+            const overlay = document.getElementById('overlay');
+            const modal = document.getElementById('modal');
+            
+            overlay.classList.remove('show');
+            modal.classList.remove('show');
+            
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                modal.style.display = 'none';
+            }, 300);
         }
-        // 모바일 환경을 위한 간단한 터치 안내 기능 (PC 마우스 드래그 최적화 기준)
+        // 6. 경량 순수 JS 꽃가루 파티클 엔진
+        function launchConfetti(x, y) {
+            const colors = ['#f1c40f', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6', '#e67e22', '#ff7979', '#badc58'];
+            for (let i = 0; i < 40; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('confetti-particle');
+                
+                const size = Math.random() * 8 + 6;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.backgroundColor = color;
+                particle.style.left = `${x}px`;
+                particle.style.top = `${y}px`;
+                particle.style.borderRadius = Math.random() > 0.5 ? '50%' : '0%';
+                
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = Math.random() * 8 + 5;
+                const vx = Math.cos(angle) * velocity;
+                const vy = Math.sin(angle) * velocity - 4; // 상단으로 포물선 추진
+                
+                document.body.appendChild(particle);
+                
+                let posX = x;
+                let posY = y;
+                let currentVx = vx;
+                let currentVy = vy;
+                let rotation = Math.random() * 360;
+                const rotationSpeed = Math.random() * 12 - 6;
+                
+                const startTime = Date.now();
+                const duration = 1200 + Math.random() * 600;
+                
+                function update() {
+                    const elapsed = Date.now() - startTime;
+                    if (elapsed > duration) {
+                        particle.remove();
+                        return;
+                    }
+                    
+                    posX += currentVx;
+                    posY += currentVy;
+                    currentVy += 0.28; // 중력 적용
+                    currentVx *= 0.98; // 공기 저항
+                    rotation += rotationSpeed;
+                    
+                    particle.style.left = `${posX}px`;
+                    particle.style.top = `${posY}px`;
+                    particle.style.transform = `rotate(${rotation}deg)`;
+                    particle.style.opacity = 1 - (elapsed / duration);
+                    
+                    requestAnimationFrame(update);
+                }
+                requestAnimationFrame(update);
+            }
+        }
+        // 모바일 터치 대응을 위한 가벼운 모션 터치 가이드
         function handleTouchStart() {
-            // 모바일 환경 하이브리드 대응을 고도화하려면 터치 좌표 이동 로직이 추가로 요구됩니다.
-            // 본 데모는 학교 PC 및 전자칠판/마우스 환경에 최적화되어 있습니다.
+            // 터치 장치 가볍게 진동 피드백 (지원 디바이스)
+            if (navigator.vibrate) {
+                navigator.vibrate(15);
+            }
         }
         // 게임 시작 실행
         initGame();
