@@ -1,93 +1,32 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-                card.dataset.type = item.type;
-                card.id = `card-${index}`;
-                // 드래그 이벤트 리스너 등록
-                // 드래그 이벤트 리스너 등록 (PC)
+            transform: scale(0.95);
+        }
+        .touch-drag-clone {
+            position: fixed !important;
+            margin: 0 !important;
+            pointer-events: none !important;
+            z-index: 10000 !important;
+            box-shadow: 0 15px 35px rgba(30, 63, 26, 0.25) !important;
+            transform: scale(1.05) !important;
+            transition: none !important;
+            opacity: 0.95 !important;
+            background-color: #ffffff !important;
+            border-color: var(--green-dark) !important;
+        }
+        .card-emoji {
+            font-size: 1.5rem;
+            display: flex;
                 card.addEventListener('dragstart', dragStart);
                 card.addEventListener('dragend', dragEnd);
-                // 모바일 터치 대응을 위한 기본 터치 이벤트 설정 (필요시 복합 라이브러리 사용 권장하나 기본 탑재)
-                card.addEventListener('touchstart', handleTouchStart, {passive: true});
                 // 모바일 터치 대응을 위한 이벤트 설정
+                // 모바일 터치 대응을 위한 이벤트 설정 (touchstart만 바인딩하고 touchmove/touchend는 드래그 시점에 동적 바인딩)
                 card.addEventListener('touchstart', handleTouchStart, {passive: false});
                 card.addEventListener('touchmove', handleTouchMove, {passive: false});
                 card.addEventListener('touchend', handleTouchEnd);
                 cardPool.appendChild(card);
             });
-        }
-        // 4. 드래그 앤 드롭 핵심 로직
-        // 4. 드래그 앤 드롭 핵심 로직 (PC & 모바일 공통 처리)
-        function dragStart() {
-            currentDragCard = this;
-            this.classList.add('dragging');
-        }
-        function dragEnd() {
-            this.classList.remove('dragging');
-        }
-        // PC 드래그 오버 및 아웃라인 처리
-        zones.forEach(zone => {
-            zone.addEventListener('dragover', (e) => {
-                e.preventDefault(); // 드롭 허용
-                this.classList.remove('hover');
-                if (!currentDragCard) return;
-                const cardType = currentDragCard.dataset.type;
-                const zoneType = this.dataset.type;
-                const dropX = e.clientX;
-                const dropY = e.clientY;
-                handleCardDrop(currentDragCard, this, dropX, dropY);
-                currentDragCard = null;
-            });
-        });
-                // 정답 검증
-                if (cardType === zoneType) {
-                    // 성공 피드백 연출 및 효과음 재생
-                    soundManager.playCorrect();
-                    
-                    // 꽃가루 파티클 터트리기 (현재 드롭 좌표 기준)
-                    const rect = this.getBoundingClientRect();
-                    const dropX = e.clientX || (rect.left + rect.width / 2);
-                    const dropY = e.clientY || (rect.top + rect.height / 2);
-                    launchConfetti(dropX, dropY);
-        // 카드 드롭 정답 처리 공통 함수
-        function handleCardDrop(card, zone, x, y) {
-            const cardType = card.dataset.type;
-            const zoneType = zone.dataset.type;
-                    currentDragCard.removeAttribute('draggable');
-                    if(zoneType === 'fake') {
-                        currentDragCard.classList.add('fake-settled');
-                    } else {
-                        currentDragCard.classList.add('real-settled');
-                    }
-                    this.appendChild(currentDragCard);
-                    
-                    showModal("🎉 정답입니다!", 
-                        zoneType === 'fake' 
-                        ? "정답! 노력 없이 얻는 짜릿함은 금방 사라지고 우리 뇌를 지치게 만들어요!" 
-                        : "딩동댕! 스스로 땀 흘려 얻은 성취감은 우리의 뇌와 마음을 튼튼하게 성장시켜요!"
-                    );
-                    correctCount++;
-                    
-                    // 모든 카드를 맞춘 경우 게임 클리어
-                    if(correctCount === totalCardsCount) {
-                        setTimeout(() => {
-                            // 대규모 축하 꽃가루 폭격
-                            for(let i=0; i<3; i++) {
-                                setTimeout(() => {
-                                    launchConfetti(window.innerWidth * (0.2 + i * 0.3), window.innerHeight * 0.4);
-                                }, i * 300);
-                            }
-                            showModal("🏆 미션 클리어!", "모든 도파민 카드를 완벽하게 구별해냈어요! 이제 일상에서도 진짜 도파민을 채우는 멋진 어린이가 되어봐요!");
-                        }, 800);
-                    }
-            // 정답 검증
-            if (cardType === zoneType) {
-                // 성공 피드백 연출 및 효과음 재생
-                soundManager.playCorrect();
-                
-                // 꽃가루 파티클 터트리기 (현재 드롭 좌표 기준)
-                launchConfetti(x, y);
-                card.removeAttribute('draggable');
                 
                 // 모바일 터치 이벤트 제거 (드래그 잠금)
                 card.removeEventListener('touchstart', handleTouchStart);
@@ -95,68 +34,12 @@
                 card.removeEventListener('touchend', handleTouchEnd);
                 if(zoneType === 'fake') {
                     card.classList.add('fake-settled');
-                } else {
-                    // 오답 피드백 연출 및 효과음 재생
-                    soundManager.playIncorrect();
-                    showModal("😢 앗, 다시 생각해 볼까요?", "이 행동은 진짜 나를 성장시키는 행동일까요, 아니면 순간의 짜릿함뿐일까요?");
-                    card.classList.add('real-settled');
-                }
-                currentDragCard = null;
-                zone.appendChild(card);
-                
-                showModal("🎉 정답입니다!", 
-                    zoneType === 'fake' 
-                    ? "정답! 노력 없이 얻는 짜릿함은 금방 사라지고 우리 뇌를 지치게 만들어요!" 
-                    : "딩동댕! 스스로 땀 흘려 얻은 성취감은 우리의 뇌와 마음을 튼튼하게 성장시켜요!"
-                );
-                correctCount++;
-                
-                // 모든 카드를 맞춘 경우 게임 클리어
-                if(correctCount === totalCardsCount) {
-                    setTimeout(() => {
-                        // 대규모 축하 꽃가루 폭격
-                        for(let i=0; i<3; i++) {
-                            setTimeout(() => {
-                                launchConfetti(window.innerWidth * (0.2 + i * 0.3), window.innerHeight * 0.4);
-                            }, i * 300);
-                        }
-                        showModal("🏆 미션 클리어!", "모든 도파민 카드를 완벽하게 구별해냈어요! 이제 일상에서도 진짜 도파민을 채우는 멋진 어린이가 되어봐요!");
-                    }, 800);
-                }
-            } else {
-                // 오답 피드백 연출 및 효과음 재생
-                soundManager.playIncorrect();
-                showModal("😢 앗, 다시 생각해 볼까요?", "이 행동은 진짜 나를 성장시키는 행동일까요, 아니면 순간의 짜릿함뿐일까요?");
-            }
-        }
-        // 모바일 터치 드래그 변수
-        let touchDragClone = null;
-        let touchOffsetX = 0;
-        let touchOffsetY = 0;
-        let lastTouchX = 0;
-        let lastTouchY = 0;
-        // 모바일 터치 시작 핸들러
-        function handleTouchStart(e) {
-            // 안착된 카드는 드래그 불가능
-            if (this.classList.contains('fake-settled') || this.classList.contains('real-settled')) {
-                return;
-            }
-            // 터치 장치 가볍게 진동 피드백 (지원 디바이스)
-            if (navigator.vibrate) {
-                navigator.vibrate(15);
-            }
-            const touch = e.touches[0];
-            currentDragCard = this;
-            this.classList.add('dragging');
-            const rect = this.getBoundingClientRect();
-            touchOffsetX = touch.clientX - rect.left;
-            touchOffsetY = touch.clientY - rect.top;
-            lastTouchX = touch.clientX;
-            lastTouchY = touch.clientY;
             // 드래그를 위한 플로팅 복제 카드(Clone) 생성
             touchDragClone = this.cloneNode(true);
             touchDragClone.classList.add('dragging');
             touchDragClone.style.position = 'fixed';
+            touchDragClone.classList.remove('dragging'); // 클론의 불필요한 opacity 스타일을 덮어쓰기 위해 제거
+            touchDragClone.classList.add('touch-drag-clone'); // 전용 드래그 클론 스타일 클래스 주입
             touchDragClone.style.left = rect.left + 'px';
             touchDragClone.style.top = rect.top + 'px';
             touchDragClone.style.width = rect.width + 'px';
@@ -170,65 +53,123 @@
             touchDragClone.style.opacity = '0.9';
             document.body.appendChild(touchDragClone);
             
+            // window 레벨에 touchmove와 touchend 등록하여 화면 이탈 문제 완전히 극복
+            window.addEventListener('touchmove', handleTouchMove, { passive: false });
+            window.addEventListener('touchend', handleTouchEnd, { passive: false });
+            window.addEventListener('touchcancel', handleTouchCancel, { passive: false });
+            
             // 터치 동작 시작 시 기본 스크롤 등 방지
-            e.preventDefault();
-        }
-        // 모바일 터치 이동 핸들러
-        function handleTouchMove(e) {
-            if (!currentDragCard || !touchDragClone) return;
-            const touch = e.touches[0];
-            lastTouchX = touch.clientX;
-            lastTouchY = touch.clientY;
-            // 복제 카드 위치 이동
-            touchDragClone.style.left = (touch.clientX - touchOffsetX) + 'px';
-            touchDragClone.style.top = (touch.clientY - touchOffsetY) + 'px';
-            // 손가락 위치에 있는 DOM 요소 찾기
-            const elem = document.elementFromPoint(touch.clientX, touch.clientY);
-            let hoverZone = null;
-            if (elem) {
-                hoverZone = elem.closest('.zone');
-            }
-            // 영역 진입 시 호버 테두리 스타일 토글
-            zones.forEach(zone => {
-                if (zone === hoverZone) {
-                    zone.classList.add('hover');
-                } else {
-                    zone.classList.remove('hover');
-                }
-            });
-        });
-            // 드래그 중 화면 스크롤 방지
             e.preventDefault();
         }
         // 모바일 터치 종료 핸들러
         function handleTouchEnd(e) {
+            // window 레벨 이벤트 리스너 제거
+            window.removeEventListener('touchmove', handleTouchMove);
+            window.removeEventListener('touchend', handleTouchEnd);
+            window.removeEventListener('touchcancel', handleTouchCancel);
             if (!currentDragCard) return;
             // 복제 카드 제거
+            currentDragCard = null;
+        }
+        // 모바일 터치 취소 핸들러
+        function handleTouchCancel(e) {
+            window.removeEventListener('touchmove', handleTouchMove);
+            window.removeEventListener('touchend', handleTouchEnd);
+            window.removeEventListener('touchcancel', handleTouchCancel);
             if (touchDragClone) {
                 touchDragClone.remove();
                 touchDragClone = null;
             }
-            // 호버 스타일 원복 및 원본 투명도 복원
             zones.forEach(zone => zone.classList.remove('hover'));
-            currentDragCard.classList.remove('dragging');
-            // 터치가 종료된 지점의 요소 검출
-            const elem = document.elementFromPoint(lastTouchX, lastTouchY);
-            const zone = elem ? elem.closest('.zone') : null;
-            if (zone) {
-                handleCardDrop(currentDragCard, zone, lastTouchX, lastTouchY);
+            if (currentDragCard) {
+                currentDragCard.classList.remove('dragging');
             }
             currentDragCard = null;
         }
         // 5. 알림창(모달) 제어
         function showModal(title, desc) {
             document.getElementById('modal-title').innerText = title;
-            }
+            document.getElementById('modal-desc').innerText = desc;
+            
+            const overlay = document.getElementById('overlay');
+            const modal = document.getElementById('modal');
+            
+            overlay.style.display = 'block';
+            modal.style.display = 'block';
+            
+            // 리플로우 강제 후 클래스 추가 (페이드인 및 스케일 애니메이션)
+            setTimeout(() => {
+                overlay.classList.add('show');
+                modal.classList.add('show');
+            }, 10);
         }
-        // 모바일 터치 대응을 위한 가벼운 모션 터치 가이드
-        function handleTouchStart() {
-            // 터치 장치 가볍게 진동 피드백 (지원 디바이스)
-            if (navigator.vibrate) {
-                navigator.vibrate(15);
+        function closeModal() {
+            const overlay = document.getElementById('overlay');
+            const modal = document.getElementById('modal');
+            
+            overlay.classList.remove('show');
+            modal.classList.remove('show');
+            
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                modal.style.display = 'none';
+            }, 300);
+        }
+        // 6. 경량 순수 JS 꽃가루 파티클 엔진
+        function launchConfetti(x, y) {
+            const colors = ['#f1c40f', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6', '#e67e22', '#ff7979', '#badc58'];
+            for (let i = 0; i < 40; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('confetti-particle');
+                
+                const size = Math.random() * 8 + 6;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.backgroundColor = color;
+                particle.style.left = `${x}px`;
+                particle.style.top = `${y}px`;
+                particle.style.borderRadius = Math.random() > 0.5 ? '50%' : '0%';
+                
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = Math.random() * 8 + 5;
+                const vx = Math.cos(angle) * velocity;
+                const vy = Math.sin(angle) * velocity - 4; // 상단으로 포물선 추진
+                
+                document.body.appendChild(particle);
+                
+                let posX = x;
+                let posY = y;
+                let currentVx = vx;
+                let currentVy = vy;
+                let rotation = Math.random() * 360;
+                const rotationSpeed = Math.random() * 12 - 6;
+                
+                const startTime = Date.now();
+                const duration = 1200 + Math.random() * 600;
+                
+                function update() {
+                    const elapsed = Date.now() - startTime;
+                    if (elapsed > duration) {
+                        particle.remove();
+                        return;
+                    }
+                    
+                    posX += currentVx;
+                    posY += currentVy;
+                    currentVy += 0.28; // 중력 적용
+                    currentVx *= 0.98; // 공기 저항
+                    rotation += rotationSpeed;
+                    
+                    particle.style.left = `${posX}px`;
+                    particle.style.top = `${posY}px`;
+                    particle.style.transform = `rotate(${rotation}deg)`;
+                    particle.style.opacity = 1 - (elapsed / duration);
+                    
+                    requestAnimationFrame(update);
+                }
+                requestAnimationFrame(update);
             }
         }
         // 게임 시작 실행
