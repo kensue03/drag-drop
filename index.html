@@ -1,618 +1,23 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>진짜 도파민을 찾아라! - 분류 게임</title>
-    
-    <!-- 귀여운 둥글글씨 구글 폰트 적용 -->
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;700;900&display=swap');
-        :root {
-            --bg-color: #FAF9F5; /* 따뜻한 웜 크림 */
-            --green-dark: #1E3F1A;
-            --green-light: #EBF5E9;
-            --fake-color: #E74C3C;
-            --real-color: #2ECC71;
-            --primary-shadow: 0 10px 30px rgba(30, 63, 26, 0.05);
-        }
-        body {
-            font-family: 'Gowun Dodum', 'Noto Sans KR', sans-serif;
-            background-color: var(--bg-color);
-            /* 아기자기한 도트 패턴 디자인 */
-            background-image: 
-                radial-gradient(#e5dec9 1.5px, transparent 1.5px), 
-                radial-gradient(#e5dec9 1.5px, var(--bg-color) 1.5px);
-            background-size: 30px 30px;
-            background-position: 0 0, 15px 15px;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            user-select: none;
-            min-height: 100vh;
-            box-sizing: border-box;
-        }
-        /* 헤더 전체 컨테이너 */
-        .header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            max-width: 1000px;
-            margin-bottom: 25px;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(10px);
-            padding: 20px 30px;
-            border-radius: 24px;
-            border: 2px solid #E8E5DA;
-            box-shadow: var(--primary-shadow);
-            box-sizing: border-box;
-            gap: 20px;
-        }
-        .title-area {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        h1 {
-            color: var(--green-dark);
-            margin: 0 0 6px 0;
-            font-size: 2.2rem;
-            font-weight: 900;
-            letter-spacing: -0.5px;
-        }
-        .subtitle {
-            color: #666;
-            margin: 0;
-            font-size: 1.15rem;
-            font-weight: 700;
-        }
-        /* 프리미엄 음향 조절 버튼 */
-        .audio-btn {
-            background-color: var(--green-dark);
-            color: white;
-            border: none;
-            padding: 12px 22px;
-            font-size: 1.05rem;
-            font-weight: 900;
-            font-family: inherit;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 6px 15px rgba(30, 63, 26, 0.25);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            white-space: nowrap;
-        }
-        .audio-btn:hover {
-            transform: translateY(-3px) scale(1.03);
-            box-shadow: 0 10px 20px rgba(30, 63, 26, 0.35);
-        }
-        .audio-btn:active {
-            transform: translateY(0) scale(0.98);
-        }
-        .audio-btn.playing {
-            background-color: #27AE60;
-            box-shadow: 0 6px 15px rgba(39, 174, 96, 0.25);
-        }
-        /* 춤추는 사운드 웨이브 바 */
-        .sound-wave {
-            display: flex;
-            align-items: flex-end;
-            gap: 3px;
-            width: 18px;
-            height: 14px;
-        }
-        .sound-wave span {
-            display: block;
-            width: 3px;
-            height: 100%;
-            background-color: white;
-            border-radius: 2px;
-            transform-origin: bottom;
-            animation: bounce-bar 0.7s ease-in-out infinite alternate;
-            animation-play-state: paused;
-        }
-        .sound-wave span:nth-child(2) { animation-delay: 0.15s; }
-        .sound-wave span:nth-child(3) { animation-delay: 0.3s; }
-        .sound-wave span:nth-child(4) { animation-delay: 0.45s; }
-        .audio-btn.playing .sound-wave span {
-            animation-play-state: running;
-        }
-        @keyframes bounce-bar {
-            0% { transform: scaleY(0.2); }
-            100% { transform: scaleY(1); }
-        }
-        /* 게임 보드 메인 레이아웃 */
-        .game-container {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            max-width: 1000px;
-            gap: 25px;
-        }
-        /* 분류 포켓(바구니) 영역 */
-        .zones-container {
-            display: flex;
-            gap: 25px;
-            width: 100%;
-        }
-        .zone {
-            flex: 1;
-            min-height: 260px;
-            border: 3px dashed #C3C0B5;
-            border-radius: 24px;
-            padding: 25px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 14px;
-            background-color: rgba(255, 255, 255, 0.65);
-            backdrop-filter: blur(5px);
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            position: relative;
-            box-sizing: border-box;
-        }
-        #fake-zone {
-            border-color: rgba(231, 76, 60, 0.35);
-        }
-        #real-zone {
-            border-color: rgba(46, 204, 113, 0.35);
-        }
-        /* 드롭존 호버 시 화려한 모션 */
-        #fake-zone.hover {
-            background-color: #FFF5F5;
-            border-color: var(--fake-color);
-            transform: scale(1.02);
-            box-shadow: 0 15px 35px rgba(231, 76, 60, 0.12);
-        }
-        #real-zone.hover {
-            background-color: #F4FBF7;
-            border-color: var(--real-color);
-            transform: scale(1.02);
-            box-shadow: 0 15px 35px rgba(46, 204, 113, 0.12);
-        }
-        .zone-title {
-            font-size: 1.45rem;
-            font-weight: 900;
-            margin-bottom: 10px;
-            padding: 8px 24px;
-            border-radius: 50px;
-            color: white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.06);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .fake-title { background-color: var(--fake-color); }
-        .real-title { background-color: var(--real-color); }
-        /* 카드 배치 보관함 */
-        .card-pool {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            justify-content: center;
-            padding: 30px;
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            border-radius: 24px;
-            border: 2px solid #E8E5DA;
-            min-height: 140px;
-            box-shadow: var(--primary-shadow);
-            box-sizing: border-box;
-            transition: all 0.3s ease;
-        }
-        /* 행동 드래그 카드 */
-        .card {
-            background-color: #ffffff;
-            color: #2D2D2D;
-            border: 2px solid #E8E5DA;
-            padding: 15px 24px;
-            border-radius: 20px;
-            cursor: grab;
-            font-size: 1.05rem;
-            font-weight: 700;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.03);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            max-width: 320px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-align: left;
-            box-sizing: border-box;
-        }
-        .card:hover {
-            transform: translateY(-6px) scale(1.02);
-            box-shadow: 0 12px 24px rgba(30, 63, 26, 0.08);
-            border-color: var(--green-dark);
-        }
-        .card:active {
-            cursor: grabbing;
-            transform: translateY(-2px) scale(0.98);
-        }
-        .card.dragging {
-            opacity: 0.4;
-            transform: scale(0.95);
-        }
-        .card-emoji {
-            font-size: 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .card-text {
-            line-height: 1.4;
-        }
-        /* 안착된 카드 스타일 (스케일 다운 및 고정) */
-        .zone .card {
-            max-width: 100%;
-            width: 95%;
-            font-size: 0.95rem;
-            padding: 10px 16px;
-            cursor: default;
-            pointer-events: none; /* 드래그 잠금 */
-            box-shadow: none;
-            animation: settled-pop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes settled-pop {
-            0% { transform: scale(0.85); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .fake-settled { 
-            background-color: #FFF5F5 !important; 
-            border-color: var(--fake-color) !important; 
-            color: var(--fake-color) !important;
-        }
-        .real-settled { 
-            background-color: #F4FBF7 !important; 
-            border-color: var(--real-color) !important; 
-            color: var(--real-color) !important;
-        }
-        /* 프리미엄 바운싱 팝업 모달 */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.8);
-            background: white;
-            padding: 35px;
-            border-radius: 30px;
-            box-shadow: 0 20px 60px rgba(30, 63, 26, 0.2);
-            text-align: center;
-            z-index: 1000;
-            width: 85%;
-            max-width: 440px;
-            box-sizing: border-box;
-            opacity: 0;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .modal.show {
-            display: block;
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-        }
-        .modal h2 { 
-            margin-top: 0; 
-            font-size: 1.9rem; 
-            font-weight: 900;
-            color: var(--green-dark);
-        }
-        
-        .modal p { 
-            font-size: 1.15rem; 
-            color: #555; 
-            line-height: 1.6;
-            margin: 15px 0 25px 0;
-            font-weight: 700;
-        }
-        .modal button {
-            background-color: var(--green-dark);
-            color: white;
-            border: none;
-            padding: 12px 35px;
-            font-size: 1.1rem;
-            font-weight: 900;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 6px 15px rgba(30, 63, 26, 0.2);
-            transition: all 0.2s ease;
-            font-family: inherit;
-        }
-        .modal button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 20px rgba(30, 63, 26, 0.3);
-        }
-        .overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(30, 63, 26, 0.4);
-            backdrop-filter: blur(6px);
-            z-index: 999;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .overlay.show {
-            display: block;
-            opacity: 1;
-        }
-        /* 꽃가루 폭죽 파티클 */
-        .confetti-particle {
-            position: fixed;
-            pointer-events: none;
-            z-index: 1001;
-        }
-        @media (max-width: 768px) {
-            .header-container {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-                gap: 15px;
-                padding: 20px;
-            }
-            .title-area {
-                align-items: center;
-            }
-            .zones-container {
-                flex-direction: column;
-                gap: 15px;
-            }
-            .zone {
-                min-height: 200px;
-            }
-            h1 {
-                font-size: 1.8rem;
-            }
-        }
-    </style>
-</head>
-<body>
-    <!-- 헤더 레이아웃 -->
-    <div class="header-container">
-        <div class="title-area">
-            <h1>🧠 "진짜 도파민"을 찾아라!</h1>
-            <div class="subtitle">아래의 행동 카드를 알맞은 주머니에 드래그해서 넣어보세요!</div>
-        </div>
-        <button id="bgm-toggle-btn" class="audio-btn playing" onclick="soundManager.toggleBgm()">
-            <div class="sound-wave">
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-            <span id="bgm-btn-text">🔇 배경음악 끄기</span>
-        </button>
-    </div>
-    <!-- 메인 게임 영역 -->
-    <div class="game-container">
-        <!-- 드롭 포켓 -->
-        <div class="zones-container">
-            <div id="fake-zone" class="zone" data-type="fake">
-                <div class="zone-title fake-title">🛑 가짜 도파민</div>
-            </div>
-            <div id="real-zone" class="zone" data-type="real">
-                <div class="zone-title real-title">✨ 진짜 도파민</div>
-            </div>
-        </div>
-        <!-- 무작위 카드 보관함 -->
-        <div id="card-pool" class="card-pool"></div>
-    </div>
-    <!-- 알림 팝업 시스템 -->
-    <div id="overlay" class="overlay" onclick="closeModal()"></div>
-    <div id="modal" class="modal">
-        <h2 id="modal-title">결과</h2>
-        <p id="modal-desc"></p>
-        <button onclick="closeModal()">확인</button>
-    </div>
-    <script>
-        // Web Audio API 기반 오디오 시스템
-        class SoundManager {
-            constructor() {
-                this.ctx = null;
-                this.bgmInterval = null;
-                this.isPlayingBgm = false;
-                this.bgmEnabled = true; // BGM 기본 활성화 상태 (ON by default)
-                this.melodyIndex = 0;
-            }
-            init() {
-                if (!this.ctx) {
-                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-                if (this.ctx.state === 'suspended') {
-                    this.ctx.resume();
-                }
-            }
-            playCorrect() {
-                this.init();
-                const now = this.ctx.currentTime;
-                
-                // 딩동댕~ 맑은 실로폰 소리 (도-미-솔-도)
-                this.playTone(523.25, 'sine', now, 0.12, 0.15); // C5
-                this.playTone(659.25, 'sine', now + 0.08, 0.12, 0.15); // E5
-                this.playTone(783.99, 'sine', now + 0.16, 0.12, 0.15); // G5
-                this.playTone(1046.50, 'sine', now + 0.24, 0.25, 0.20); // C6
-            }
-            playIncorrect() {
-                this.init();
-                const now = this.ctx.currentTime;
-                
-                // 낮고 둔탁한 띠로리~ 효과음
-                const osc1 = this.ctx.createOscillator();
-                const osc2 = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                
-                osc1.type = 'sawtooth';
-                osc1.frequency.setValueAtTime(180, now);
-                osc1.frequency.linearRampToValueAtTime(120, now + 0.35);
-                
-                osc2.type = 'sine';
-                osc2.frequency.setValueAtTime(185, now);
-                osc2.frequency.linearRampToValueAtTime(125, now + 0.35);
-                
-                gain.gain.setValueAtTime(0.08, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
-                
-                osc1.connect(gain);
-                osc2.connect(gain);
-                gain.connect(this.ctx.destination);
-                
-                osc1.start(now);
-                osc2.start(now);
-                osc1.stop(now + 0.35);
-                osc2.stop(now + 0.35);
-            }
-            playTone(freq, type, start, duration, volume) {
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                
-                osc.type = type;
-                osc.frequency.setValueAtTime(freq, start);
-                
-                gain.gain.setValueAtTime(volume, start);
-                gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
-                
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                
-                osc.start(start);
-                osc.stop(start + duration);
-            }
-            toggleBgm() {
-                this.init();
-                if (this.bgmEnabled) {
-                    this.bgmEnabled = false;
-                    this.stopBgm();
-                    document.getElementById('bgm-btn-text').innerHTML = '🔊 배경음악 켜기';
-                    document.getElementById('bgm-toggle-btn').classList.remove('playing');
-                } else {
-                    this.bgmEnabled = true;
-                    this.startBgm();
-                    document.getElementById('bgm-btn-text').innerHTML = '🔇 배경음악 끄기';
-                    document.getElementById('bgm-toggle-btn').classList.add('playing');
-                }
-            }
-            startBgm() {
-                if (this.isPlayingBgm) return;
-                this.isPlayingBgm = true;
-                this.melodyIndex = 0;
-                
-                // 동요 느낌의 밝고 경쾌한 멜로디 (도미솔솔 라라솔~)
-                const melody = [
-                    261.63, 329.63, 392.00, 392.00, // 도 미 솔 솔
-                    440.00, 440.00, 392.00, 0,      // 라 라 솔 (쉬고)
-                    349.23, 349.23, 329.63, 329.63, // 파 파 미 미
-                    293.66, 293.66, 261.63, 0       // 레 레 도 (쉬고)
-                ];
-                
-                const tempo = 300; // 음표 간격 (ms)
-                
-                this.bgmInterval = setInterval(() => {
-                    const now = this.ctx.currentTime;
-                    const freq = melody[this.melodyIndex % melody.length];
-                    
-                    if (freq > 0) {
-                        const osc = this.ctx.createOscillator();
-                        const gain = this.ctx.createGain();
-                        
-                        osc.type = 'triangle';
-                        osc.frequency.setValueAtTime(freq, now);
-                        
-                        gain.gain.setValueAtTime(0.03, now); // 귀엽고 부드러운 오르골 볼륨
-                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
-                        
-                        osc.connect(gain);
-                        gain.connect(this.ctx.destination);
-                        
-                        osc.start(now);
-                        osc.stop(now + 0.3);
-                        
-                        // 4분음표마다 가벼운 베이스 반주 추가
-                        if (this.melodyIndex % 4 === 0) {
-                            this.playTone(freq / 2, 'sine', now, 0.6, 0.015);
-                        }
-                    }
-                    
-                    this.melodyIndex++;
-                }, tempo);
-            }
-            stopBgm() {
-                this.isPlayingBgm = false;
-                if (this.bgmInterval) {
-                    clearInterval(this.bgmInterval);
-                    this.bgmInterval = null;
-                }
-            }
-        }
-        const soundManager = new SoundManager();
-        // 사용자 첫 터치/클릭 상호작용 발생 시 AudioContext 활성화 및 BGM 자동 시작
-        function autoInitAudio() {
-            soundManager.init();
-            if (soundManager.bgmEnabled && !soundManager.isPlayingBgm) {
-                soundManager.startBgm();
-            }
-            document.removeEventListener('click', autoInitAudio);
-            document.removeEventListener('touchstart', autoInitAudio);
-            document.removeEventListener('dragstart', autoInitAudio);
-        }
-        document.addEventListener('click', autoInitAudio);
-        document.addEventListener('touchstart', autoInitAudio);
-        document.addEventListener('dragstart', autoInitAudio);
-        // 1. 기획안의 10개 데이터 정의 (귀여운 이모지 및 수정 요구사항 포함)
-        const itemData = [
-            { text: "스마트폰으로 짧은 동영상(숏폼) 끝없이 넘겨보기", type: "fake", emoji: "📱" },
-            { text: "어려운 수학 문제를 포기하지 않고 끝까지 풀어내기", type: "real", emoji: "✍️" },
-            { text: "몇 번의 시도 만에 인형 뽑기 기계에서 인형 뽑기 성공하기", type: "fake", emoji: "🧸" },
-            { text: "줄넘기 2단 뛰기를 매일 연습해서 마침내 성공하기", type: "real", emoji: "🏃" },
-            { text: "내가 직접 계획을 세워서 방 청소 깔끔하게 끝내기", type: "real", emoji: "🧹" },
-            { text: "클릭 몇 번으로 쉽게 강력한 게임 아이템 사기", type: "fake", emoji: "⚔️" },
-            { text: "용돈을 차곡차곡 모아서 갖고 싶던 물건 사기", type: "real", emoji: "🐷" },
-            { text: "자극적인 게임을 하며 밤새도록 컴퓨터 앞에 앉아있기", type: "fake", emoji: "🖥️" },
-            { text: "피아노 곡이나 동아리 춤 연습을 해서 무대에서 멋지게 공연하기", type: "real", emoji: "🎹" },
-            { text: "SNS에 사진을 올리고 '좋아요' 알림만 계속 새로고침 하기", type: "fake", emoji: "❤️" }
-        ];
-        const cardPool = document.getElementById('card-pool');
-        const zones = document.querySelectorAll('.zone');
-        let currentDragCard = null;
-        let totalCardsCount = itemData.length;
-        let correctCount = 0;
-        // 2. 카드 무작위 섞기 (셔플 알고리즘)
-        function shuffle(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-        // 3. 게임 초기화 및 카드 생성
-        function initGame() {
-            cardPool.innerHTML = '';
-            correctCount = 0;
-            document.getElementById('fake-zone').innerHTML = '<div class="zone-title fake-title">🛑 가짜 도파민</div>';
-            document.getElementById('real-zone').innerHTML = '<div class="zone-title real-title">✨ 진짜 도파민</div>';
-            
-            const shuffledData = shuffle([...itemData]);
-            shuffledData.forEach((item, index) => {
-                const card = document.createElement('div');
-                card.classList.add('card');
-                card.setAttribute('draggable', 'true');
-                
-                // 프리미엄 이모지 데코 구조 추가
-                card.innerHTML = `<span class="card-emoji">${item.emoji}</span><span class="card-text">${item.text}</span>`;
                 card.dataset.type = item.type;
                 card.id = `card-${index}`;
                 // 드래그 이벤트 리스너 등록
+                // 드래그 이벤트 리스너 등록 (PC)
                 card.addEventListener('dragstart', dragStart);
                 card.addEventListener('dragend', dragEnd);
                 // 모바일 터치 대응을 위한 기본 터치 이벤트 설정 (필요시 복합 라이브러리 사용 권장하나 기본 탑재)
                 card.addEventListener('touchstart', handleTouchStart, {passive: true});
+                // 모바일 터치 대응을 위한 이벤트 설정
+                card.addEventListener('touchstart', handleTouchStart, {passive: false});
+                card.addEventListener('touchmove', handleTouchMove, {passive: false});
+                card.addEventListener('touchend', handleTouchEnd);
                 cardPool.appendChild(card);
             });
         }
         // 4. 드래그 앤 드롭 핵심 로직
+        // 4. 드래그 앤 드롭 핵심 로직 (PC & 모바일 공통 처리)
         function dragStart() {
             currentDragCard = this;
             this.classList.add('dragging');
@@ -620,21 +25,20 @@
         function dragEnd() {
             this.classList.remove('dragging');
         }
+        // PC 드래그 오버 및 아웃라인 처리
         zones.forEach(zone => {
             zone.addEventListener('dragover', (e) => {
                 e.preventDefault(); // 드롭 허용
-            });
-            zone.addEventListener('dragenter', function() {
-                this.classList.add('hover');
-            });
-            zone.addEventListener('dragleave', function() {
-                this.classList.remove('hover');
-            });
-            zone.addEventListener('drop', function(e) {
                 this.classList.remove('hover');
                 if (!currentDragCard) return;
                 const cardType = currentDragCard.dataset.type;
                 const zoneType = this.dataset.type;
+                const dropX = e.clientX;
+                const dropY = e.clientY;
+                handleCardDrop(currentDragCard, this, dropX, dropY);
+                currentDragCard = null;
+            });
+        });
                 // 정답 검증
                 if (cardType === zoneType) {
                     // 성공 피드백 연출 및 효과음 재생
@@ -645,6 +49,10 @@
                     const dropX = e.clientX || (rect.left + rect.width / 2);
                     const dropY = e.clientY || (rect.top + rect.height / 2);
                     launchConfetti(dropX, dropY);
+        // 카드 드롭 정답 처리 공통 함수
+        function handleCardDrop(card, zone, x, y) {
+            const cardType = card.dataset.type;
+            const zoneType = zone.dataset.type;
                     currentDragCard.removeAttribute('draggable');
                     if(zoneType === 'fake') {
                         currentDragCard.classList.add('fake-settled');
@@ -672,98 +80,148 @@
                             showModal("🏆 미션 클리어!", "모든 도파민 카드를 완벽하게 구별해냈어요! 이제 일상에서도 진짜 도파민을 채우는 멋진 어린이가 되어봐요!");
                         }, 800);
                     }
+            // 정답 검증
+            if (cardType === zoneType) {
+                // 성공 피드백 연출 및 효과음 재생
+                soundManager.playCorrect();
+                
+                // 꽃가루 파티클 터트리기 (현재 드롭 좌표 기준)
+                launchConfetti(x, y);
+                card.removeAttribute('draggable');
+                
+                // 모바일 터치 이벤트 제거 (드래그 잠금)
+                card.removeEventListener('touchstart', handleTouchStart);
+                card.removeEventListener('touchmove', handleTouchMove);
+                card.removeEventListener('touchend', handleTouchEnd);
+                if(zoneType === 'fake') {
+                    card.classList.add('fake-settled');
                 } else {
                     // 오답 피드백 연출 및 효과음 재생
                     soundManager.playIncorrect();
                     showModal("😢 앗, 다시 생각해 볼까요?", "이 행동은 진짜 나를 성장시키는 행동일까요, 아니면 순간의 짜릿함뿐일까요?");
+                    card.classList.add('real-settled');
                 }
                 currentDragCard = null;
+                zone.appendChild(card);
+                
+                showModal("🎉 정답입니다!", 
+                    zoneType === 'fake' 
+                    ? "정답! 노력 없이 얻는 짜릿함은 금방 사라지고 우리 뇌를 지치게 만들어요!" 
+                    : "딩동댕! 스스로 땀 흘려 얻은 성취감은 우리의 뇌와 마음을 튼튼하게 성장시켜요!"
+                );
+                correctCount++;
+                
+                // 모든 카드를 맞춘 경우 게임 클리어
+                if(correctCount === totalCardsCount) {
+                    setTimeout(() => {
+                        // 대규모 축하 꽃가루 폭격
+                        for(let i=0; i<3; i++) {
+                            setTimeout(() => {
+                                launchConfetti(window.innerWidth * (0.2 + i * 0.3), window.innerHeight * 0.4);
+                            }, i * 300);
+                        }
+                        showModal("🏆 미션 클리어!", "모든 도파민 카드를 완벽하게 구별해냈어요! 이제 일상에서도 진짜 도파민을 채우는 멋진 어린이가 되어봐요!");
+                    }, 800);
+                }
+            } else {
+                // 오답 피드백 연출 및 효과음 재생
+                soundManager.playIncorrect();
+                showModal("😢 앗, 다시 생각해 볼까요?", "이 행동은 진짜 나를 성장시키는 행동일까요, 아니면 순간의 짜릿함뿐일까요?");
+            }
+        }
+        // 모바일 터치 드래그 변수
+        let touchDragClone = null;
+        let touchOffsetX = 0;
+        let touchOffsetY = 0;
+        let lastTouchX = 0;
+        let lastTouchY = 0;
+        // 모바일 터치 시작 핸들러
+        function handleTouchStart(e) {
+            // 안착된 카드는 드래그 불가능
+            if (this.classList.contains('fake-settled') || this.classList.contains('real-settled')) {
+                return;
+            }
+            // 터치 장치 가볍게 진동 피드백 (지원 디바이스)
+            if (navigator.vibrate) {
+                navigator.vibrate(15);
+            }
+            const touch = e.touches[0];
+            currentDragCard = this;
+            this.classList.add('dragging');
+            const rect = this.getBoundingClientRect();
+            touchOffsetX = touch.clientX - rect.left;
+            touchOffsetY = touch.clientY - rect.top;
+            lastTouchX = touch.clientX;
+            lastTouchY = touch.clientY;
+            // 드래그를 위한 플로팅 복제 카드(Clone) 생성
+            touchDragClone = this.cloneNode(true);
+            touchDragClone.classList.add('dragging');
+            touchDragClone.style.position = 'fixed';
+            touchDragClone.style.left = rect.left + 'px';
+            touchDragClone.style.top = rect.top + 'px';
+            touchDragClone.style.width = rect.width + 'px';
+            touchDragClone.style.height = rect.height + 'px';
+            touchDragClone.style.margin = '0';
+            touchDragClone.style.pointerEvents = 'none'; // touchmove 시 하단 요소(zone) 검출을 위해 필수
+            touchDragClone.style.zIndex = '10000';
+            touchDragClone.style.boxShadow = '0 10px 30px rgba(30, 63, 26, 0.15)';
+            touchDragClone.style.transform = 'scale(1.05)';
+            touchDragClone.style.transition = 'none';
+            touchDragClone.style.opacity = '0.9';
+            document.body.appendChild(touchDragClone);
+            
+            // 터치 동작 시작 시 기본 스크롤 등 방지
+            e.preventDefault();
+        }
+        // 모바일 터치 이동 핸들러
+        function handleTouchMove(e) {
+            if (!currentDragCard || !touchDragClone) return;
+            const touch = e.touches[0];
+            lastTouchX = touch.clientX;
+            lastTouchY = touch.clientY;
+            // 복제 카드 위치 이동
+            touchDragClone.style.left = (touch.clientX - touchOffsetX) + 'px';
+            touchDragClone.style.top = (touch.clientY - touchOffsetY) + 'px';
+            // 손가락 위치에 있는 DOM 요소 찾기
+            const elem = document.elementFromPoint(touch.clientX, touch.clientY);
+            let hoverZone = null;
+            if (elem) {
+                hoverZone = elem.closest('.zone');
+            }
+            // 영역 진입 시 호버 테두리 스타일 토글
+            zones.forEach(zone => {
+                if (zone === hoverZone) {
+                    zone.classList.add('hover');
+                } else {
+                    zone.classList.remove('hover');
+                }
             });
         });
+            // 드래그 중 화면 스크롤 방지
+            e.preventDefault();
+        }
+        // 모바일 터치 종료 핸들러
+        function handleTouchEnd(e) {
+            if (!currentDragCard) return;
+            // 복제 카드 제거
+            if (touchDragClone) {
+                touchDragClone.remove();
+                touchDragClone = null;
+            }
+            // 호버 스타일 원복 및 원본 투명도 복원
+            zones.forEach(zone => zone.classList.remove('hover'));
+            currentDragCard.classList.remove('dragging');
+            // 터치가 종료된 지점의 요소 검출
+            const elem = document.elementFromPoint(lastTouchX, lastTouchY);
+            const zone = elem ? elem.closest('.zone') : null;
+            if (zone) {
+                handleCardDrop(currentDragCard, zone, lastTouchX, lastTouchY);
+            }
+            currentDragCard = null;
+        }
         // 5. 알림창(모달) 제어
         function showModal(title, desc) {
             document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-desc').innerText = desc;
-            
-            const overlay = document.getElementById('overlay');
-            const modal = document.getElementById('modal');
-            
-            overlay.style.display = 'block';
-            modal.style.display = 'block';
-            
-            // 리플로우 강제 후 클래스 추가 (페이드인 및 스케일 애니메이션)
-            setTimeout(() => {
-                overlay.classList.add('show');
-                modal.classList.add('show');
-            }, 10);
-        }
-        function closeModal() {
-            const overlay = document.getElementById('overlay');
-            const modal = document.getElementById('modal');
-            
-            overlay.classList.remove('show');
-            modal.classList.remove('show');
-            
-            setTimeout(() => {
-                overlay.style.display = 'none';
-                modal.style.display = 'none';
-            }, 300);
-        }
-        // 6. 경량 순수 JS 꽃가루 파티클 엔진
-        function launchConfetti(x, y) {
-            const colors = ['#f1c40f', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6', '#e67e22', '#ff7979', '#badc58'];
-            for (let i = 0; i < 40; i++) {
-                const particle = document.createElement('div');
-                particle.classList.add('confetti-particle');
-                
-                const size = Math.random() * 8 + 6;
-                const color = colors[Math.floor(Math.random() * colors.length)];
-                
-                particle.style.width = `${size}px`;
-                particle.style.height = `${size}px`;
-                particle.style.backgroundColor = color;
-                particle.style.left = `${x}px`;
-                particle.style.top = `${y}px`;
-                particle.style.borderRadius = Math.random() > 0.5 ? '50%' : '0%';
-                
-                const angle = Math.random() * Math.PI * 2;
-                const velocity = Math.random() * 8 + 5;
-                const vx = Math.cos(angle) * velocity;
-                const vy = Math.sin(angle) * velocity - 4; // 상단으로 포물선 추진
-                
-                document.body.appendChild(particle);
-                
-                let posX = x;
-                let posY = y;
-                let currentVx = vx;
-                let currentVy = vy;
-                let rotation = Math.random() * 360;
-                const rotationSpeed = Math.random() * 12 - 6;
-                
-                const startTime = Date.now();
-                const duration = 1200 + Math.random() * 600;
-                
-                function update() {
-                    const elapsed = Date.now() - startTime;
-                    if (elapsed > duration) {
-                        particle.remove();
-                        return;
-                    }
-                    
-                    posX += currentVx;
-                    posY += currentVy;
-                    currentVy += 0.28; // 중력 적용
-                    currentVx *= 0.98; // 공기 저항
-                    rotation += rotationSpeed;
-                    
-                    particle.style.left = `${posX}px`;
-                    particle.style.top = `${posY}px`;
-                    particle.style.transform = `rotate(${rotation}deg)`;
-                    particle.style.opacity = 1 - (elapsed / duration);
-                    
-                    requestAnimationFrame(update);
-                }
-                requestAnimationFrame(update);
             }
         }
         // 모바일 터치 대응을 위한 가벼운 모션 터치 가이드
